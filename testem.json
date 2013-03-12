@@ -1,0 +1,7 @@
+{
+  "framework": "jasmine",
+  "src_files": [
+    "components/curl/src/curl.js",
+    "test/**/*-tests.js"
+  ]
+}
