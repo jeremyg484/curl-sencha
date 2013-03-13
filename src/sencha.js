@@ -93,41 +93,35 @@
 
 		wrapSource['load'] = function (resourceId, require, callback, config) {
 			
-			require([], function() {
+			var path = (!global.Ext ? resourceId : resolvePath(resourceId)) + ".js",
+			    moduleMap;
+			
+			require(['text!' + path], function (source) {
+			
+				// find dependencies
+				moduleMap = (global.Ext ? extractDeps(source) : ['']);
 				
-				Ext = global.Ext;
+				//console.log("Module Map for " + resourceId + " : " + moduleMap);
 				
-				var path = (!global.Ext ? resourceId : resolvePath(resourceId)) + ".js",
-				    moduleMap;
-				
-				require(['text!' + path], function (source) {
-				
-					// find dependencies
-					moduleMap = (global.Ext ? extractDeps(source) : ['']);
+				// get deps
+				require(moduleMap, function () {
+
+					//console.log("All dependencies resolved for " + resourceId);
 					
-					//console.log("Module Map for " + resourceId + " : " + moduleMap);
+					// wrap source in a define
+					source = wrapSource(source, resourceId);
 					
-					// get deps
-					require(moduleMap, function () {
+					injectScript(source);
+					
+					cache[resourceId] = true;
 
-						//console.log("All dependencies resolved for " + resourceId);
-						
-						// wrap source in a define
-						source = wrapSource(source, resourceId);
-						
-						injectScript(source);
-						
-						cache[resourceId] = true;
-
-						// call callback now that the module is defined
-						callback(require(resourceId));
-
-					}, callback['error'] || function (ex) { throw ex; });
+					// call callback now that the module is defined
+					callback(require(resourceId));
 
 				}, callback['error'] || function (ex) { throw ex; });
-			
+
 			}, callback['error'] || function (ex) { throw ex; });
-			
+		
 		};
 
 		wrapSource['cramPlugin'] = '../cram/sencha';
