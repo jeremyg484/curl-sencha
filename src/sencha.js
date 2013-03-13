@@ -16,15 +16,13 @@
 
 	define(function () {
 
-		var head, insertBeforeEl, injectSource, mainEx, cache, Ext;
+		var head, insertBeforeEl, injectSource, cache;
 
 		head = document && (document['head'] || document.getElementsByTagName('head')[0]);
 		// to keep IE from crying, we need to put scripts before any
 		// <base> elements, but after any <meta>. this should do it:
 		insertBeforeEl = head && head.getElementsByTagName('base')[0] || null;
 
-		mainEx = /ext-dev$/;
-		
 		cache = {};
 		
 		function wrapSource (source, resourceId, fullUrl) {
@@ -32,7 +30,7 @@
 			return "(function (global) {\n" +
 					"define('" + resourceId + "'," +
 											//Didn't want to expose the global Ext, but there are some sad cases where Ext code requires it
-			(mainEx.test(resourceId) ? "[],function(){" + source + "\nglobal.Ext = Ext;\nreturn Ext;\n" :
+			(!global.Ext ? "[],function(){" + source + "\nglobal.Ext = Ext;\nreturn Ext;\n" :
 											//This could be a bit over-optimistic, but seems to work with every module tried so far
 											"['Ext'],function(Ext){\nvar mod = " + source + "\n return mod;\n") +
 			"});\n})(this);\n" + sourceUrl + "\n";
@@ -86,7 +84,7 @@
 			var pathEx = /^.+?\//, prefix, rootPath, extPath, path;
 			//console.log("Resolving path for " + resourceId);
 			prefix = pathEx.exec(resourceId)[0];
-			extPath = Ext.Loader.getPath(resourceId.replace(/\//g, ".")).replace(/\.js$/, "");
+			extPath = global.Ext.Loader.getPath(resourceId.replace(/\//g, ".")).replace(/\.js$/, "");
 			rootPath = pathEx.exec(extPath)[0];
 			path = prefix !== rootPath ? prefix + extPath : extPath;
 			//console.log("Resolved to " + path);
@@ -95,17 +93,17 @@
 
 		wrapSource['load'] = function (resourceId, require, callback, config) {
 			
-			require([!Ext && !mainEx.test(resourceId) ? 'Ext' : ''], function() {
+			require([], function() {
 				
-				Ext = global.Ext || arguments[0];
+				Ext = global.Ext;
 				
-				var path = (!Ext ? resourceId : resolvePath(resourceId)) + ".js",
+				var path = (!global.Ext ? resourceId : resolvePath(resourceId)) + ".js",
 				    moduleMap;
 				
 				require(['text!' + path], function (source) {
 				
 					// find dependencies
-					moduleMap = (!mainEx.test(resourceId) ? extractDeps(source) : ['']);
+					moduleMap = (global.Ext ? extractDeps(source) : ['']);
 					
 					//console.log("Module Map for " + resourceId + " : " + moduleMap);
 					

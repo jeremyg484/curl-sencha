@@ -1,19 +1,20 @@
 var curlConfig = {
 	paths: {
-		curl: 'components/curl/src/curl'
+		curl: 'components/curl/src/curl',
+		sencha: 'src/sencha'
 	},
 	packages: [{
 		name: 'Ext',
 		location: 'components/ext',
-		main: 'ext-dev',
+		main: 'ext-debug',
 		config: {
-			moduleLoader: 'src/sencha'
+			moduleLoader: 'sencha'
 		}
 	}, {
 		name: 'MyCompany',
 		location: 'test/MyCompany',
 		config: {
-			moduleLoader: 'src/sencha'
+			moduleLoader: 'sencha'
 		}
 	}],
 	preloads: ['Ext']
