@@ -6,7 +6,7 @@ var curlConfig = {
 	packages: [{
 		name: 'Ext',
 		location: 'components/ext',
-		main: 'ext-debug',
+		main: 'ext',
 		config: {
 			moduleLoader: 'sencha'
 		}
