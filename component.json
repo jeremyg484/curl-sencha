@@ -1,7 +1,7 @@
 {
   "name": "curl-sencha",
   "version": "0.1.0",
-  "dependencies": {
+  "devDependencies": {
   	"curl": "jeremyg484/curl#0.8.0-dev",
   	"ext": "http://cdn.sencha.com/ext-4.1.1a-gpl.zip"
   }
